@@ -15,6 +15,8 @@ pip install timm==0.6.0
 
 pip install mmengine==0.2.0
 
-pip install numpy scipy opencv-python pyyaml tqdm
+pip install numpy==1.25.0
 
->  Similar to many previous works, to accelerate training and inference, our implementation adopts the efficient large-kernel convolution proposed in SLaK. Please follow the official installation guideline to compile and install the required operator: https://github.com/VITA-Group/SLaK#installation
+pip install scipy pyyaml tqdm
+
+⭐️: Similar to many previous works, to accelerate training and inference, our implementation adopts the efficient large-kernel convolution proposed in SLaK. Please follow the official installation guideline to compile and install the required operator: https://github.com/VITA-Group/SLaK#installation
