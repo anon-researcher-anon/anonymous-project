@@ -441,7 +441,15 @@ class ContextGuidedDeformableAttention(nn.Module):
         k_sampled = k_sampled.sum(dim=-1)#B，head,context_per_head,h,w
         k = self.context_k_proj(k_sampled.view(B, -1, H, W))#B,context_dim,h,w
        
-        v = self.context_v_proj(deformable_x)
+        C_v = deformable_x.shape[1]
+        v_per_head = C_v // self.num_heads
+        v_multi_head = deformable_x.view(B, self.num_heads, v_per_head, H, W)
+        v_multi_head = v_multi_head.reshape(B * self.num_heads, v_per_head, H, W)#B*head,v_per_head,h,w
+        v_sampled = F.grid_sample(v_multi_head, sampling_grid_reshaped, mode='bilinear', padding_mode='zeros', align_corners=False)#B * num_heads, v_per_head, H * W, num_sampling_points
+        v_sampled = v_sampled.view(B, self.num_heads, v_per_head, H, W, self.num_sampling_points)
+        v_sampled = v_sampled.sum(dim=-1)#B，head,v_per_head,h,w
+        v = self.context_v_proj(v_sampled.view(B, -1, H, W))#B,x_deformable_dim,h,w
+
         
         q_heads = q.view(B, self.num_heads, self.head_dim, H*W).transpose(2, 3)  # [B, H, N, D]
         k_heads = k.view(B, self.num_heads, self.head_dim, H*W).transpose(2, 3)  # [B, H, N, D]  
